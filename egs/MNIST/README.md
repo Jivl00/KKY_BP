@@ -16,9 +16,9 @@
 
 #### Results
 
-|  Task |   TaskSpecification  | Framework |  Model  |  Loss  |   Acc  |
-|:-----:|:--------------------:|:---------:|:-------:|:------:|:------:|
-| MNIST | 60K train / 10K test |   Keras   | convnet | 0.0239 | 0.9922 |
+|  Task |   TaskSpecification  | Framework |  Model  |  Loss  |   Acc  |         Script            |
+|:-----:|:--------------------:|:---------:|:-------:|:------:|:------:|:-------------------------:|
+| MNIST | 50K train / 10K test |   Keras   | convnet | 0.0239 | 0.9922 | mnist_keras_convnet.ipynb |
 
 [1]: http://yann.lecun.com/exdb/mnist/
 [2]: https://keras.io/
