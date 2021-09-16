@@ -1,5 +1,5 @@
 ### The MNIST task - classification of handwritten digits
-#### [Oficial webpage][1]
+#### [Dataset webpage][1]
 ---
 
 #### Frameworks
