@@ -1,5 +1,6 @@
 # Založení gitu
 https://github.com/ → email + heslo
+
 ---
 # Základy práce s Gitem
 - clone – vytvoření klonu repozitáře
