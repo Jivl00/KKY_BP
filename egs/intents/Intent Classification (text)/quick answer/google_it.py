@@ -1,3 +1,8 @@
+'''
+NOTE: Google constantly keeps on changing its SERP structure and overall algorithm
+so this code will eventually stop working
+'''
+
 import re
 import requests
 from bs4 import BeautifulSoup
