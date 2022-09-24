@@ -48,12 +48,16 @@ def design_model(inp_shape, hidden_layers, out_units, print_summary=True):
 
 
 def fit_model(model, trainloader, params, optimizer, criterion, verbose=1):
-    loss_list = []
+    train_accu = []
+    train_losses = []
 
     for epoch in range(params['epochs']):
-
         # Set model to train configuration
         model.train()
+
+        running_loss = 0
+        correct = 0
+        total = 0
         for x_train, y_train in trainloader:
             y_train = y_train.long()
 
@@ -72,10 +76,24 @@ def fit_model(model, trainloader, params, optimizer, criterion, verbose=1):
             # Update parameters
             optimizer.step()
 
-            loss_list.append(loss.data)
+            running_loss += loss.item()
 
-            if verbose > 0:
-                print('epoch {}, loss {}'.format(epoch, loss.item()))
+            _, predicted = y_pred.max(1)
+            total += y_train.size(0)
+            correct += predicted.eq(y_train).sum().item()
+
+        # Loss for each epoch = running_loss/ number of batches
+        train_loss = running_loss / len(trainloader)
+
+        # Accuracy = number of correct classifications / the total amount of classifications
+        accu = correct / total
+
+        train_accu.append(accu)
+        train_losses.append(train_loss)
+
+        if verbose > 0:
+            print('Epoch: %d/%d loss: %.4f - accuracy: %.4f' % (epoch + 1, params['epochs'], train_loss, accu))
+    return train_accu, train_losses
 
 
 def evaluate_model(model_path, x_test, y_test, print_detail):
@@ -134,6 +152,32 @@ def predict_single(user_input, model):
     return target_names[pred]
 
 
+def train_process_graph(accu, losses):
+
+    # Creating plot with loss
+    fig, ax1 = plt.subplots()
+
+    color = 'tab:red'
+    ax1.set_xlabel('Epochs')
+    ax1.set_ylabel('Loss', color=color)
+    ax1.plot(losses, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    # Adding Twin Axes to plot using accuracy
+    ax2 = ax1.twinx()
+
+    color = 'tab:green'
+    ax2.set_ylabel('Accuracy', color=color)
+    ax2.plot(accu, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    # Adding title
+    plt.title('Training process')
+
+    # Show plot
+    plt.show()
+
+
 class Data(Dataset):
     def __init__(self):
         self.x_train = torch.from_numpy(data['x_train'])
@@ -175,13 +219,12 @@ if __name__ == '__main__':
 
     # -- SETTINGS
     NET_PARAMS = {
-        'hidden_layers': [64, 32],
+        'hidden_layers': [58, 28],
         'learning_rate': 0.1,
-        'metrics': ['accuracy'],
-        'epochs': 100,
+        'epochs': 50,
         'batch_size': 10,
         'do_fit': True,
-        'overwrite_best_model': True
+        'overwrite_best_model': False
     }
     neurons_num = {'inp_shape': len(data['x_train'][0]), 'hidden_layers': NET_PARAMS['hidden_layers'],
                    'out_units': len(target_names)}
@@ -214,9 +257,11 @@ if __name__ == '__main__':
     # Train the network
     if NET_PARAMS['do_fit']:
         log('Training the model...')
-        fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=0)
+        accu, losses = fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=1)
         torch.save(model.state_dict(), best_model_path)
         log('Model trained.')
+        train_process_graph(accu, losses)
+
 
     # -- NEURAL NETWORK EVALUATION
 

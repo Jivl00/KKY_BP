@@ -107,6 +107,31 @@ def load_best_model(best_model_path="models/best.h5"):
     return load_model(best_model_path)
 
 
+def train_process_graph(accu, losses):
+    # Creating plot with loss
+    fig, ax1 = plt.subplots()
+
+    color = 'tab:red'
+    ax1.set_xlabel('Epochs')
+    ax1.set_ylabel('Loss', color=color)
+    ax1.plot(losses, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    # Adding Twin Axes to plot using accuracy
+    ax2 = ax1.twinx()
+
+    color = 'tab:green'
+    ax2.set_ylabel('Accuracy', color=color)
+    ax2.plot(accu, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    # Adding title
+    plt.title('Training process')
+
+    # Show plot
+    plt.show()
+
+
 if __name__ == '__main__':
 
     log('TF loaded. Using ' + ('GPU' if 'GPU' in str(device_lib.list_local_devices()) else 'CPU'))
@@ -127,7 +152,7 @@ if __name__ == '__main__':
         'learning_rate': 0.1,
         'loss': 'categorical_crossentropy',
         'metrics': ['accuracy'],
-        'epochs': 100,
+        'epochs': 50,
         'batch_size': 10,
         'do_fit': True,
         'overwrite_best_model': True
@@ -156,15 +181,17 @@ if __name__ == '__main__':
     # Train the network
     if NET_PARAMS['do_fit']:
         log('Training the model...')
-        model.fit(data['x_train'], data['y_train'],
-                  epochs=NET_PARAMS['epochs'],
-                  batch_size=NET_PARAMS['batch_size'],
-                  shuffle=True,
-                  verbose=0,
-                  validation_split=0.1,
-                  callbacks=[ModelCheckpoint(best_model_path, monitor='val_loss', verbose=False, save_best_only=True,
-                                             save_weights_only=False)])
+        h = model.fit(data['x_train'], data['y_train'],
+                      epochs=NET_PARAMS['epochs'],
+                      batch_size=NET_PARAMS['batch_size'],
+                      shuffle=True,
+                      verbose=0,
+                      validation_split=0.1,
+                      callbacks=[
+                          ModelCheckpoint(best_model_path, monitor='val_loss', verbose=False, save_best_only=True,
+                                          save_weights_only=False)])
         log('Model trained.')
+        train_process_graph(h.history['accuracy'], h.history['loss'])
 
     # -- NEURAL NETWORK EVALUATION
 
