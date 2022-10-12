@@ -4,6 +4,7 @@ import pickle
 
 classifier = 'keras'
 # classifier = 'pytorch'
+plt.rcParams.update({'font.size': 15})
 
 # Data load
 with open('temp/' + classifier + '/y1.pickle', 'rb') as rb:
