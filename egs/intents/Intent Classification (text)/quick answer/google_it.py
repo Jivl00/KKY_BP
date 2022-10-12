@@ -9,6 +9,9 @@ from bs4 import BeautifulSoup
 
 
 def search(google_question):
+    if 'pocasi' in google_question:
+        import seznam_cz
+        return seznam_cz.search(google_question)
     print(google_question)
     google_question = re.sub(r'[^\w\s]', '', (google_question.lower())).replace(' ', '%20')
     url = 'https://www.google.com/search?q=' + google_question
@@ -18,6 +21,8 @@ def search(google_question):
                       'Chrome/64.0.3282.186 Safari/537.36'}
     r = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(r.text, 'lxml')
+    # with open('google_backup/' + google_question + '.html', 'w', encoding='utf-8') as fp:
+    #     fp.write(soup.prettify())
 
     results = [soup.find('tr', class_='ztXv9').find('th')
                if soup.find('tr', class_='ztXv9') is not None else None,
@@ -45,7 +50,7 @@ def search(google_question):
     print()
     return out
 
-
+#
 # google_question = 'Kdy se narodil Trump?'
 # search(google_question)
 # google_question = 'Kdy se narodila kralovna Alzbeta?'
@@ -66,10 +71,10 @@ def search(google_question):
 # search(google_question)
 # google_question = 'hlavní město makedonie'
 # search(google_question)
-# google_question = 'pocasi plzen'
-# search(google_question)
-# google_question = 'Jake je pocasi v Praze?'
-# search(google_question)
+google_question = 'pocasi plzen'
+search(google_question)
+google_question = 'Jake je pocasi v Praze?'
+search(google_question)
 # google_question = 'jaky je kurz eura'
 # search(google_question)
 # google_question = 'jake je nejvetsi zvire'
