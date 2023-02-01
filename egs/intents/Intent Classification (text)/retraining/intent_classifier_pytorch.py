@@ -2,8 +2,8 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from torchsummary import summary
 from sklearn.metrics import accuracy_score
-import matplotlib.pyplot as plt
-import scikitplot as skplt
+# import matplotlib.pyplot as plt
+# import scikitplot as skplt
 import torch
 import numpy as np
 import os
@@ -124,9 +124,9 @@ def evaluate_model(model_path, x_test, y_test, print_detail):
     y_pred_num = torch.max(y_pred.data, 1).indices
     y_test_num = torch.max(torch.from_numpy(y_test), 1).indices
     print("Model accuracy: {}".format(accuracy_score(y_test_num, y_pred_num)))
-    skplt.metrics.plot_confusion_matrix(
-        y_test_num, y_pred_num, x_tick_rotation=90)
-    plt.show()
+    # skplt.metrics.plot_confusion_matrix(
+    #     y_test_num, y_pred_num, x_tick_rotation=90)
+    # plt.show()
 
     if print_detail:  # Print predicted vs test classes
         # Load target names
@@ -138,6 +138,20 @@ def evaluate_model(model_path, x_test, y_test, print_detail):
         for i in range(len(y_test_num)):
             print(
                 'Predicted: {} {}   Test: {} {}'.format(y_pred_num[i], y_pred_names[i], y_test_num[i], y_test_names[i]))
+    # save wrong predictions to tsv file
+    with open('temp/target_names.pickle', 'rb') as rb:
+        target_names = pickle.load(rb)
+    with open(DATA_FILE, 'r', encoding='utf-8-sig') as r:
+        sentences = r.readlines()
+    with open('wrong_predictions.tsv', 'w', encoding='utf-8-sig') as w:
+        w.write('Sentence\tPredicted class\tCorrect class\n')
+        for i in range(len(y_test_num)):
+            pred = y_pred_num[i]
+            true = y_test_num[i]
+            if pred != true:
+                sentence = sentences[i][:-1].split(' ')[1]
+                print('{}\t Predicted class: {} Correct class: {}'.format(sentence, target_names[pred], target_names[true]))
+                w.write('{}\t{}\t{}\n'.format(sentence, target_names[pred], target_names[true]))
 
 
 def load_best_model(model_path="models/best"):
@@ -170,29 +184,29 @@ def predict_single(user_input, model):
     return target_names[pred]
 
 
-def train_process_graph(accu, losses):
-    # Creating plot with loss
-    fig, ax1 = plt.subplots()
-
-    color = 'tab:red'
-    ax1.set_xlabel('Epochs')
-    ax1.set_ylabel('Loss', color=color)
-    ax1.plot(losses, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    # Adding Twin Axes to plot using accuracy
-    ax2 = ax1.twinx()
-
-    color = 'tab:green'
-    ax2.set_ylabel('Accuracy', color=color)
-    ax2.plot(accu, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-
-    # Adding title
-    plt.title('Training process')
-
-    # Show plot
-    plt.show()
+# def train_process_graph(accu, losses):
+#     # Creating plot with loss
+#     fig, ax1 = plt.subplots()
+#
+#     color = 'tab:red'
+#     ax1.set_xlabel('Epochs')
+#     ax1.set_ylabel('Loss', color=color)
+#     ax1.plot(losses, color=color)
+#     ax1.tick_params(axis='y', labelcolor=color)
+#
+#     # Adding Twin Axes to plot using accuracy
+#     ax2 = ax1.twinx()
+#
+#     color = 'tab:green'
+#     ax2.set_ylabel('Accuracy', color=color)
+#     ax2.plot(accu, color=color)
+#     ax2.tick_params(axis='y', labelcolor=color)
+#
+#     # Adding title
+#     plt.title('Training process')
+#
+#     # Show plot
+#     plt.show()
 
 
 def retrain(inputs_and_predictions, correct_intent, add_intent=False, retrain_all=True):
@@ -291,7 +305,7 @@ def retrain(inputs_and_predictions, correct_intent, add_intent=False, retrain_al
                 accu, losses = fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=0)
                 torch.save(model.state_dict(), best_model_path)
                 log('Model trained.')
-                train_process_graph(accu, losses)
+                # train_process_graph(accu, losses)
 
                 evaluate_model(best_model_path, data['x_train'], data['y_train'], print_detail=False)
             else: # retrain model on the new sample only
@@ -387,15 +401,15 @@ def main():
     # Train the network
     if NET_PARAMS['do_fit']:
         log('Training the model...')
-        accu, losses = fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=1)
+        accu, losses = fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=0)
         torch.save(model.state_dict(), best_model_path)
         log('Model trained.')
-        train_process_graph(accu, losses)
+        # train_process_graph(accu, losses)
 
     # -- NEURAL NETWORK EVALUATION
 
     # Evaluate on test data (test data = train data - insufficient amount of data)
-    evaluate_model(best_model_path, data['x_train'], data['y_train'], print_detail=False)
+    evaluate_model(best_model_path, data['x_train'], data['y_train'], print_detail=True)
 
 if __name__ == '__main__':
     main()
