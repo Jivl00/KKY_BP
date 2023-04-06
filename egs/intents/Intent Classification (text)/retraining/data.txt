@@ -1,4 +1,4 @@
-POZDRAV Ahoj
+﻿POZDRAV Ahoj
 POZDRAV Dobrý den
 POZDRAV Čau
 POZDRAV Nazdar

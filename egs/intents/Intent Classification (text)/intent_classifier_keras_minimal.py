@@ -130,7 +130,7 @@ if __name__ == '__main__':
         'epochs': 20,
         'batch_size': 10,
         'do_fit': True,
-        'overwrite_best_model': False
+        'overwrite_best_model': True
     }
 
     # -- NEURAL NETWORK DESIGN

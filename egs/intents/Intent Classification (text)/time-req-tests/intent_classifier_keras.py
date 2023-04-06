@@ -1,6 +1,7 @@
 import os
 import random
 import numpy as np
+from matplotlib import pyplot as plt
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # shut up tensorflow debug messages
 import tensorflow as tf
@@ -50,7 +51,7 @@ def design_model(inp_shape, out_units, params, print_summary=True):
         NET = Dense(units=n_cells, activation='relu')(NET)
 
     # Output layer
-    NET_O = Dense(units=out_units, activation='sigmoid')(NET)
+    NET_O = Dense(units=out_units, activation='softmax')(NET)
 
     model = Model(inputs=NET_I, outputs=NET_O)
 
@@ -101,6 +102,34 @@ def predict_single(user_input, model):
 def load_best_model(best_model_path="models/best.h5"):
     return load_model(best_model_path)
 
+def train_process_graph(accu, losses):
+    # Creating plot with loss
+    fig, ax1 = plt.subplots()
+
+    plt.rcParams.update({'font.size': 14})
+
+    color = 'tab:red'
+    ax1.tick_params(axis='both', labelsize=14)
+    ax1.set_xlabel('Epochs', fontsize=14)
+    ax1.set_ylabel('Loss', color=color, fontsize=14)
+    ax1.plot(losses, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    # Adding Twin Axes to plot using accuracy
+    ax2 = ax1.twinx()
+
+    color = 'tab:green'
+    ax2.set_ylabel('Accuracy', color=color)
+    ax2.plot(accu, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    # Adding title
+    plt.title('Training process')
+    plt.grid()
+
+    # Show plot
+    plt.savefig('temp/train_process_keras.pdf')
+    plt.show()
 
 if __name__ == '__main__':
 
@@ -119,11 +148,11 @@ if __name__ == '__main__':
 
     NET_PARAMS = {
         'hidden_layers': [35],
-        'learning_rate': 0.1,
+        'learning_rate': 0.01,
         'loss': 'categorical_crossentropy',
         'metrics': ['accuracy'],
-        'epochs': 20,
-        'batch_size': 10,
+        'epochs': 30,
+        'batch_size': 40,
         'do_fit': True,
         'overwrite_best_model': True
     }
@@ -134,7 +163,7 @@ if __name__ == '__main__':
     model = design_model(inp_shape=len(data['x_train'][0]), out_units=len(target_names), params=NET_PARAMS)
 
     # Optimizer
-    optimizer = tf.keras.optimizers.SGD(learning_rate=NET_PARAMS['learning_rate'])
+    optimizer = tf.keras.optimizers.Adam(learning_rate=NET_PARAMS['learning_rate'])
 
     # Network compilation
     model.compile(loss=NET_PARAMS['loss'], optimizer=optimizer, metrics=NET_PARAMS['metrics'])
@@ -154,13 +183,14 @@ if __name__ == '__main__':
         h = model.fit(data['x_train'], data['y_train'],
                       epochs=NET_PARAMS['epochs'],
                       batch_size=NET_PARAMS['batch_size'],
-                      shuffle=True,
+                      shuffle=False,
                       verbose=0,
-                      validation_split=0.1,
+                      validation_split=0,
                       callbacks=[
-                          ModelCheckpoint(best_model_path, monitor='val_loss', verbose=False, save_best_only=True,
+                          ModelCheckpoint(best_model_path, monitor='val_loss', verbose=False, save_best_only=False,
                                           save_weights_only=False)])
         log('Model trained.')
+        train_process_graph(h.history['accuracy'], h.history['loss'])
 
     # -- NEURAL NETWORK EVALUATION
 

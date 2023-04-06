@@ -15,6 +15,7 @@ def make_prediction(nn, inputs_and_predictions):
     if prediction == "chyba":
         print("What was the correct intent?")
         correct_intent = input()
+        print(inputs_and_predictions)
         nn.retrain(inputs_and_predictions, correct_intent, retrain_all=True, add_intent=False)
     return prediction
 

@@ -224,7 +224,7 @@ if __name__ == '__main__':
         'epochs': 50,
         'batch_size': 10,
         'do_fit': True,
-        'overwrite_best_model': False
+        'overwrite_best_model': True
     }
     neurons_num = {'inp_shape': len(data['x_train'][0]), 'hidden_layers': NET_PARAMS['hidden_layers'],
                    'out_units': len(target_names)}

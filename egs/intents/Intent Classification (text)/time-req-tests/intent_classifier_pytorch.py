@@ -3,14 +3,14 @@ from torch.utils.data import Dataset, DataLoader
 from torchsummary import summary
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
-import scikitplot as skplt
+# import scikitplot as skplt
 import torch
 import numpy as np
 import os
 from data_prep import *
 from logs import log, fix_ts
 
-torch.manual_seed(0)
+torch.manual_seed(1)
 
 # Force use CPU
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
@@ -106,9 +106,9 @@ def evaluate_model(model_path, x_test, y_test, print_detail):
     y_pred_num = torch.max(y_pred.data, 1).indices
     y_test_num = torch.from_numpy(y_test)
     print("Model accuracy: {}".format(accuracy_score(y_test_num, y_pred_num)))
-    skplt.metrics.plot_confusion_matrix(
-        y_test_num, y_pred_num, x_tick_rotation=90)
-    plt.show()
+    # skplt.metrics.plot_confusion_matrix(
+    #     y_test_num, y_pred_num, x_tick_rotation=90)
+    # plt.show()
 
     if print_detail:  # Print predicted vs test classes
         # Load target names
@@ -156,9 +156,12 @@ def train_process_graph(accu, losses):
     # Creating plot with loss
     fig, ax1 = plt.subplots()
 
+    plt.rcParams.update({'font.size': 14})
+
     color = 'tab:red'
-    ax1.set_xlabel('Epochs')
-    ax1.set_ylabel('Loss', color=color)
+    ax1.tick_params(axis='both', labelsize=14)
+    ax1.set_xlabel('Epochs', fontsize=14)
+    ax1.set_ylabel('Loss', color=color, fontsize=14)
     ax1.plot(losses, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
 
@@ -172,8 +175,10 @@ def train_process_graph(accu, losses):
 
     # Adding title
     plt.title('Training process')
+    plt.grid()
 
     # Show plot
+    plt.savefig('temp/train_process_pytorch.pdf')
     plt.show()
 
 
@@ -197,7 +202,7 @@ class Net(nn.Module):
         self.NET_O = nn.Linear(hidden_layers[0], out_units)
 
     def forward(self, x):
-        x = torch.sigmoid(self.NET_I(x))
+        x = torch.relu(self.NET_I(x))
         x = self.NET_O(x)
         return x
 
@@ -216,10 +221,10 @@ if __name__ == '__main__':
 
     # -- SETTINGS
     NET_PARAMS = {
-        'hidden_layers': [15],
-        'learning_rate': 0.1,
-        'epochs': 21,
-        'batch_size': 10,
+        'hidden_layers': [35],
+        'learning_rate': 0.01,
+        'epochs': 30,
+        'batch_size':40,
         'do_fit': True,
         'overwrite_best_model': True
     }
@@ -241,7 +246,7 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
 
     # Optimizer
-    optimizer = torch.optim.SGD(model.parameters(), lr=NET_PARAMS['learning_rate'])
+    optimizer = torch.optim.Adam(model.parameters(), lr=NET_PARAMS['learning_rate'])
 
     # -- NEURAL NETWORK TRAINING
 

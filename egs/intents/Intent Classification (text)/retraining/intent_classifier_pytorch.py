@@ -35,7 +35,7 @@ data = {}
 
 def form_data(samples, targets, target_names):
     global data
-    """ Prepare matrices for machine learning in Keras
+    """ Prepare matrices for machine learning in PyTorch
         return dict with keys: 'x_train', 'y_train'
     """
 
@@ -96,7 +96,7 @@ def fit_model(model, trainloader, params, optimizer, criterion, verbose=1):
             optimizer.step()
 
             running_loss += loss.item()
-            _, predicted = y_pred.max(1)
+            _, predicted = torch.max(y_pred.data, 1)
             total += y_train.size(0)
             correct += predicted.eq(y_train.max(1)[1]).sum().item()
 
@@ -401,7 +401,7 @@ def main():
     # Train the network
     if NET_PARAMS['do_fit']:
         log('Training the model...')
-        accu, losses = fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=0)
+        accu, losses = fit_model(model, trainloader, NET_PARAMS, optimizer, criterion, verbose=1)
         torch.save(model.state_dict(), best_model_path)
         log('Model trained.')
         # train_process_graph(accu, losses)
@@ -409,7 +409,7 @@ def main():
     # -- NEURAL NETWORK EVALUATION
 
     # Evaluate on test data (test data = train data - insufficient amount of data)
-    evaluate_model(best_model_path, data['x_train'], data['y_train'], print_detail=True)
+    evaluate_model(best_model_path, data['x_train'], data['y_train'], print_detail=False)
 
 if __name__ == '__main__':
     main()

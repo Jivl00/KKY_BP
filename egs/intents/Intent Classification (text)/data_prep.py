@@ -7,7 +7,10 @@ from transformers import logging
 logging.set_verbosity_error()  # shut up Bert warning
 
 # Load czech BERT model
-bert_model = SentenceTransformer('fav-kky/FERNET-C5')
+bert_path = 'fav-kky/FERNET-C5'
+bert_model = SentenceTransformer(bert_path)
+bert_model.save(bert_path)
+
 
 
 def read_data(data_file):

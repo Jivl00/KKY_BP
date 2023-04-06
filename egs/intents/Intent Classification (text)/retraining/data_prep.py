@@ -7,8 +7,14 @@ from transformers import logging
 logging.set_verbosity_error()  # shut up Bert warning
 
 # Load czech BERT model
-bert_model = SentenceTransformer('fav-kky/FERNET-C5')
-
+bert_path = 'fav-kky/FERNET-C5'
+# model = SentenceTransformer('bert-base-nli-stsb-mean-tokens')
+# model = SentenceTransformer('bert-base-nli-mean-tokens')
+# model.save(bert_path)
+model = SentenceTransformer(bert_path)
+# model.save(bert_path)
+# bert_model = SentenceTransformer('fav-kky/FERNET-C5')
+bert_model = model
 
 def read_data(data_file):
     """ Read data
@@ -23,6 +29,8 @@ def read_data(data_file):
     with open(data_file, 'r', encoding='utf-8-sig') as r:
         # Read samples and targets
         for ind, line in enumerate(r):
+            if line == '\n':
+                continue
             line = line.lower()
             line = clean_text(line).strip('\n')  # remove punctuation and '\n'
             line = clean_numbers(line)  # replace numbers with '#'
