@@ -1,4 +1,5 @@
 import json
+import math
 import pickle
 import time
 
@@ -18,8 +19,8 @@ NET_PARAMS = {
     'hidden_layers': [512, 256],
     'learning_rate': 0.003,
     'learning_rate_decay': 0.9,
-    'batch_size': 2048,
-    'epochs': 300
+    'batch_size': 8,
+    'epochs': 30
 }
 
 
@@ -44,6 +45,7 @@ class Net(nn.Module):
     def new_m(self, m):  # m is the new number of classes
         self.fc_out = nn.Linear(self.hidden_layers[-1], m)
 
+
 class Model:
     def __init__(self):
         # Net
@@ -56,7 +58,16 @@ class Model:
         self.criterion = nn.CrossEntropyLoss()
 
     def init_net(self, inp_shape, hidden_layers, out_units, print_summary=False):
-        self.net = Net(inp_shape, hidden_layers, out_units)
+        self.net = load_best_model()
+        # freeze all layers
+        for param in self.net.parameters():
+            param.requires_grad = False
+        # unfreeze last layer
+        for param in self.net.fc_out.parameters():
+            param.requires_grad = True
+        # reinitialize last layer
+        self.net.fc_out = nn.Linear(hidden_layers[-1], out_units)
+
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=NET_PARAMS['learning_rate'])
 
         if print_summary:
@@ -152,6 +163,7 @@ class Model:
         print('Test loss: {:.4f} - acc: {:.4f}'.format(test_loss, accu))
         return accu, test_loss
 
+
 def form(file):
     samples = []
     targets = []
@@ -195,6 +207,7 @@ def read_data(train, test, valid):
     #
     return samples, targets, target_names
 
+
 def train_process_graph(accu, losses):
     # Creating plot with loss
     fig, ax1 = plt.subplots()
@@ -225,6 +238,15 @@ def train_process_graph(accu, losses):
     plt.show()
 
 
+def load_best_model(model_path="models/best_model"):
+    with open('models/neurons_num.pickle', 'rb') as rb:  # Load data (deserialize)
+        neurons_num = pickle.load(rb)
+    model = Net(inp_shape=neurons_num['inp_shape'], hidden_layers=neurons_num['hidden_layers'],
+                out_units=neurons_num['out_shape'])
+    model.load_state_dict(torch.load(model_path))
+    return model
+
+
 class IntentDataset(Dataset):
     def __init__(self, samples, targets):
         self.samples = torch.from_numpy(samples)
@@ -241,142 +263,58 @@ class IntentDataset(Dataset):
 
 
 def main():
-
     # Load data
-    path = 'dataset-2'
-    with open(path + '/train-cs.tsv', 'r', encoding='utf-8-sig') as f:
+    path = 'data_robot'
+    with open(path + '/data_robot_bigger.txt', 'r', encoding='utf-8-sig') as f:
         train = [line for line in f]
-    with open(path + '/test-cs.tsv', 'r', encoding='utf-8-sig') as f:
-        test = [line for line in f]
-    with open(path + '/dev-cs.tsv', 'r', encoding='utf-8-sig') as f:
-        valid = [line for line in f]
 
+    train_test_valid = []
 
+    times = []
+    accuracies = []
+    for i, line in enumerate(train):
+        torch.manual_seed(2)
+        if line == '\n':
+            train_test_valid = train[:i]
 
-    samples, targets, target_names = read_data(train, test, valid)
+            NET_PARAMS['epochs'] = int(math.log(len(train_test_valid), 2))*2
+            # NET_PARAMS['epochs'] = int(math.sqrt(len(train_test_valid)))*2
+            # NET_PARAMS['epochs'] = int(len(train_test_valid))
+            NET_PARAMS['batch_size'] = int(len(train_test_valid)/NET_PARAMS['epochs'])
 
-    train_dataset = IntentDataset(samples['train'], targets['train'])
-    test_dataset = IntentDataset(samples['test'], targets['test'])
-    valid_dataset = IntentDataset(samples['valid'], targets['valid'])
+            samples, targets, target_names = read_data(train_test_valid, train_test_valid, train_test_valid)
 
-    neurons_num = {'inp_shape': len(samples['valid'][0]), 'out_shape': len(target_names), 'hidden_layers': NET_PARAMS['hidden_layers']}
-    # with open('models/neurons_num.pickle', 'wb') as wb:  # Store data (serialize) for model loading
-    #     pickle.dump(neurons_num, wb, protocol=pickle.HIGHEST_PROTOCOL)
+            train_dataset = IntentDataset(samples['train'], targets['train'])
+            test_dataset = IntentDataset(samples['test'], targets['test'])
+            valid_dataset = IntentDataset(samples['valid'], targets['valid'])
 
-    train_loader = DataLoader(dataset=train_dataset, batch_size=NET_PARAMS['batch_size'])
-    test_loader = DataLoader(dataset=test_dataset, batch_size=NET_PARAMS['batch_size'])
-    valid_loader = DataLoader(dataset=valid_dataset, batch_size=NET_PARAMS['batch_size'])
+            neurons_num = {'inp_shape': len(samples['valid'][0]), 'out_shape': len(target_names)}
 
-    model = Model()
-    model.init_net(neurons_num['inp_shape'], NET_PARAMS['hidden_layers'], neurons_num['out_shape'])
+            train_loader = DataLoader(dataset=train_dataset, batch_size=NET_PARAMS['batch_size'])
+            test_loader = DataLoader(dataset=test_dataset, batch_size=NET_PARAMS['batch_size'])
+            valid_loader = DataLoader(dataset=valid_dataset, batch_size=NET_PARAMS['batch_size'])
 
-    print('Training the model...')
-    train_accu, train_losses, dev_losses = model.fit(train_loader, valid_loader, epochs=NET_PARAMS['epochs'], verbose=0)
-    # train_process_graph(train_accu, train_losses)
-    print('Model trained.')
+            start_time = time.time()
+            model = Model()
+            model.init_net(neurons_num['inp_shape'], NET_PARAMS['hidden_layers'], neurons_num['out_shape'])
 
-    print('Testing the model...')
+            print('Training the model...')
+            train_accu, train_losses, dev_losses = model.fit(train_loader, valid_loader, epochs=NET_PARAMS['epochs'], verbose=0)
+            # train_process_graph(train_accu, train_losses)
+            print('Model trained.')
 
-    model.evaluate(test_loader)
+            print('Testing the model...')
 
-    # ------------------ Fine-tuning ------------------
+            accu, test_loss = model.evaluate(test_loader)
+            end_time = time.time()
 
-    train = train[100 * 20:]
-    valid = valid[20 * 20:]
-    test = test[30 * 20:]
-    numers_of_samples_per_class = {'train': 20, 'test': 6, 'valid': 4}
-
-
-    new_train = []
-    new_valid = []
-    new_test = []
-    for i in range(0, len(train), 100):
-        new_train.extend(train[i:i + numers_of_samples_per_class['train']])
-    for i in range(0, len(valid), 20):
-        new_valid.extend(valid[i:i + numers_of_samples_per_class['valid']])
-    for i in range(0, len(test), 30):
-        new_test.extend(test[i:i + numers_of_samples_per_class['test']])
-    train = new_train
-    valid = new_valid
-    test = new_test
-
-
-
-    samples, targets, target_names = read_data(train, test, valid)
-
-    train_dataset = IntentDataset(samples['train'], targets['train'])
-    test_dataset = IntentDataset(samples['test'], targets['test'])
-    valid_dataset = IntentDataset(samples['valid'], targets['valid'])
-
-    neurons_num = {'inp_shape': len(samples['valid'][0]), 'out_shape': len(target_names)}
-
-    train_loader = DataLoader(dataset=train_dataset, batch_size=NET_PARAMS['batch_size'])
-    test_loader = DataLoader(dataset=test_dataset, batch_size=NET_PARAMS['batch_size'])
-    valid_loader = DataLoader(dataset=valid_dataset, batch_size=NET_PARAMS['batch_size'])
-
-    # replace the last layer
-    model.reinit_net(neurons_num['out_shape'])
-
-    # a new model
-    model2 = Model()
-    model2.init_net(neurons_num['inp_shape'], NET_PARAMS['hidden_layers'], neurons_num['out_shape'])
-
-    print('Fine-tuning the model...')
-    train_accu_ft, train_losses_ft, dev_losses_ft = model.fit(train_loader, valid_loader, NET_PARAMS['epochs'], verbose=0)
-    model.evaluate(test_loader)
-
-    print('Training the model from scratch...')
-    train_accu_scratch, train_losses_scratch, dev_losses_scratch = model2.fit(train_loader, valid_loader, NET_PARAMS['epochs'], verbose=0)
-    model2.evaluate(test_loader)
-
-    with open('data_for_graphs.json', 'a', encoding='utf-8') as f:
-        json.dump({'130': {'train_accu_ft': train_accu_ft, 'train_losses_ft': train_losses_ft, 'dev_losses_ft': dev_losses_ft,
-                         'train_accu_scratch': train_accu_scratch, 'train_losses_scratch': train_losses_scratch, 'dev_losses_scratch': dev_losses_scratch}}
-                    , f, ensure_ascii=False, indent=4)
-
-
-    # Plotting
-    fig, ax = plt.subplots()
-    plt.rcParams.update({'font.size': 14})
-    ax.tick_params(axis='both', labelsize=14)
-    ax.set_xlabel('Epochs', fontsize=14)
-    ax.set_ylabel('Loss', fontsize=14)
-    ax.plot(train_losses_scratch, label='Training from scratch')
-    ax.plot(train_losses_ft, label='Fine-tuning')
-    ax.legend()
-    plt.title('Training loss development')
-    plt.grid()
-    plt.savefig('train_process_pytorch3.pdf')
-    plt.show()
-
-    fig, ax = plt.subplots()
-    plt.rcParams.update({'font.size': 14})
-    ax.tick_params(axis='both', labelsize=14)
-    ax.set_xlabel('Epochs', fontsize=14)
-    ax.set_ylabel('Loss', fontsize=14)
-    ax.plot(dev_losses_scratch, label='Training from scratch')
-    ax.plot(dev_losses_ft, label='Fine-tuning')
-    ax.legend()
-    plt.title('Validation loss development')
-    plt.grid()
-    plt.savefig('valid_process_pytorch3.pdf')
-    plt.show()
-
-
-    fig, ax = plt.subplots()
-    plt.rcParams.update({'font.size': 14})
-    ax.tick_params(axis='both', labelsize=14)
-    ax.set_xlabel('Epochs', fontsize=14)
-    ax.set_ylabel('Accuracy', fontsize=14)
-    ax.plot(train_accu_scratch, label='Training from scratch')
-    ax.plot(train_accu_ft, label='Fine-tuning')
-    ax.legend()
-    plt.title('Accuracy development')
-    plt.grid()
-    plt.savefig('accuracy_pytorch3.pdf')
-    plt.show()
-
-    print('Done.')
+            times.append(end_time - start_time)
+            accuracies.append(accu)
+    # with open(path + '/acc.txt', 'w', encoding='utf-8-sig') as f:
+    #     for accu in accuracies:
+    #         f.write(str(accu) + '\n')
+    with open(path + '/epochs_time2.json', 'a', encoding='utf-8-sig') as f:
+        json.dump({'log(#samples)*2': {'times': times, 'accuracies': accuracies}}, f)
 
 
 if __name__ == '__main__':

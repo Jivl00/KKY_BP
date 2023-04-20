@@ -235,6 +235,7 @@ class IntentDataset(Dataset):
 
 def main():
     tested_params = [[512, 256], [256, 128], [128, 64], [64, 32], [32, 16]]
+    tested_params = [[4096, 2048]]
     classes_cut = [{'train': 100 * 0, 'test': 30 * 0, 'valid': 20 * 0},
                    {'train': 100 * 30, 'test': 30 * 30, 'valid': 20 * 30},
                    {'train': 100 * 60, 'test': 30 * 60, 'valid': 20 * 60},
