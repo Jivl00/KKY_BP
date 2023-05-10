@@ -101,4 +101,4 @@ for tim1, t in enumerate(ts[1:]):
         ax[0].text(t, 1.15, exp[str(t)]['m'], color='red')
 
 plt.show()
-fig.savefig('test2.pdf', bbox_inches='tight', dpi=350)
+# fig.savefig('test2.pdf', bbox_inches='tight', dpi=350)
