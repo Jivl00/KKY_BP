@@ -1,0 +1,20 @@
+﻿POZDRAV & Nazdar \\
+KALENDÁŘ & Jaký je rok \\
+VYGOOGLI & Kdo je prezident ve Francii \\
+STOP & Stop \\
+POZNEJ & Co to je? \\
+POZNEJ & Jaký je to předmět \\
+POZNEJ & Poznej, co to je \\
+POZNEJ & Urči, o co se jedná \\
+POZNEJ & Jaká je to věc \\
+POKYN & Rozsviť LED \\
+POKYN & Zamávej \\
+POKYN & Otoč se \\
+POKYN & Zapískej \\
+POKYN & Zvedni levou ruku \\
+CHAT & Jak se máš? \\
+CHAT & Jak se jmenuješ? \\
+CHAT & Kdo jsi? \\
+CHAT & Máš rád čokoládu? \\
+CHAT & jaký je účel existence \\
+CHAT & co je smyslem života \\

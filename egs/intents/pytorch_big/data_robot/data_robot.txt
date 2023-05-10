@@ -1,0 +1,122 @@
+Otoč se doleva	otoč se
+Otoč se doprava	otoč se
+Otoč se o 30 stupňů	otoč se
+Otoč se o 45 stupňů doprava	otoč se
+Otoč se o 45 stupňů doleva	otoč se
+Obrať se doleva	otoč se
+Obrať se doprava	otoč se
+Rotuj o 10 stupňů doleva	otoč se
+Rotuj o 120 stupňů doprava	otoč se
+Zatoč se dokola	otoč se
+
+
+Zablikej LED 1	LED
+Zablikej LED 2	LED
+Zablikej LED 3	LED
+Zablikej LED 4	LED
+Zablikej LED 3 a 4	LED
+Rozsviť LED 1	LED
+Rozsviť všechny LED	LED
+
+
+Odkud svítí sluníčko?	detekce světla
+Jak moc svítí sluníčko?	detekce světla
+Jak moc svítí světlo?	detekce světla
+Odkud svítí světlo?	detekce světla
+Kde je zdroj světla?	detekce světla
+Kde je největší jas?	detekce světla
+
+Co je tohle?	detekce objektu
+Co to je?	detekce objektu
+Co je to?	detekce objektu
+Copak je to?	detekce objektu
+Co je tohle za předmět?	detekce objektu
+Poznej, o co se jedná	detekce objektu
+Co je tohle za věc?	detekce objektu
+
+
+Tohle je Anna.	seznam se
+Tohle je Petr.	seznam se
+Tohle je Karel.	seznam se
+Tohle je Jana.	seznam se
+Představuji ti Petra.	seznam se
+Představuji ti Karolínu.	seznam se
+
+Jak se řekne moře v angličtině?	překlad
+Jak se řekne auto v němčině?	překlad
+Jak se řekne stůl v polštině?	překlad
+Jak se řekne židle v ruštině?	překlad
+ve španělštině, seznamte se se mnou zítra se říká jak	překlad
+ve francouzštině, jak to mám říct, uvidíme se později	překlad
+jak se řekne ahoj v japonštině	překlad
+jak mohu říct „zrušit objednávku“ francouzsky	překlad
+jak řeknu španělsky večeře	překlad
+jak se řekne sbohem francouzsky	překlad
+jak španělsky říct děkuji	překlad
+jak řeknu sbohem v čínštině	překlad
+jak mohu říci velmi děkuji v čínštině	překlad
+Potřebuji vědět, jak pozdravit ve Francii	překlad
+řekl byste mi, jak se rozloučit ve francii	překlad
+jak se řekne ahoj v Mexiku	překlad
+řekni mi, jak pozdravit v chile	překlad
+Chci vědět, jak se rozloučit ve Francii	překlad
+přeložil byste mi prosím větu do ruštiny	překlad
+přeložil byste mi frázi do mandarínštiny	překlad
+můžete mi toto jméno přeložit do španělštiny, prosím	překlad
+mohl byste mi to přeložit do čínštiny, prosím	překlad
+mohl byste mi přeložit vodu do nizozemštiny	překlad
+
+Jak se máš?	Chat GPT
+Jak se jmenuješ?	Chat GPT
+Kdo jsi?	Chat GPT
+Máš rád čokoládu?	Chat GPT
+definujte mi prosím peníze	Chat GPT
+řekni mi význam hegemonie	Chat GPT
+co znamená rozhořčení	Chat GPT
+definujte mi prosím ambivalenci	Chat GPT
+prosím definujte institucionální rasismus	Chat GPT
+definuj mi prosím antagonistu	Chat GPT
+co rozlišovat znamená	Chat GPT
+co znamená slovo aliance	Chat GPT
+potřebuji vědět, co znamená dominovat	Chat GPT
+jaká je definice slova migrovat	Chat GPT
+řekněte mi prosím, co znamená paean	Chat GPT
+chci vědět, co je smyslem života	Chat GPT
+Chci slyšet, o čem si myslíš, že je smyslem života	Chat GPT
+co je podle tebe smyslem života	Chat GPT
+jaký je účel existence	Chat GPT
+jaký je podle vás náš smysl života	Chat GPT
+chtěl bych znát smysl života	Chat GPT
+jaký je tvůj názor na smysl života	Chat GPT
+co je smyslem života	Chat GPT
+řekni mi všechno o smyslu života	Chat GPT
+řekni mi své myšlenky o smyslu života	Chat GPT
+máte nějaké představy o smyslu života?	Chat GPT
+
+
+Co je hlavní město České republiky.	vyhledávání
+Kde je největší hrad v České republice.	vyhledávání
+kolik je hodin ve Francii	vyhledávání
+kolik je hodin v Londýně právě teď	vyhledávání
+kolik je hodin v Londýně	vyhledávání
+kolik je hodin	vyhledávání
+kolik je hodin v londýně	vyhledávání
+kolik je hodin v pacifickém časovém pásmu	vyhledávání
+kolik je hodin v pacifickém standardním čase	vyhledávání
+je čokoláda pro vás špatná nebo dobrá	vyhledávání
+jsou hranolky zdravé nebo ne	vyhledávání
+řekni mi nutriční údaje běžného banánu	vyhledávání
+je čokoláda zdravá	vyhledávání
+jaké jsou nutriční informace pro krevety	vyhledávání
+jaká je aktuální předpověď počasí	vyhledávání
+jaké je počasí	vyhledávání
+jaká je předpověď na den	vyhledávání
+předpověď počasí prosím	vyhledávání
+jaké je dnes počasí	vyhledávání
+bude zítra pršet	vyhledávání
+jaké je venku počasí	vyhledávání
+jaké bude zítra počasí	vyhledávání
+jaké je počasí v atlantě	vyhledávání
+jaké je počasí v tokiu	vyhledávání
+jaká je dnes vlhkost	vyhledávání
+jaká byla včera teplota	vyhledávání
